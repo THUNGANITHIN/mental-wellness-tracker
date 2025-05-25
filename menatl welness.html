@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Wellness Support App</title>
+  <style>
+    :root {
+      --bg-gradient: linear-gradient(45deg, #e3f2fd, #fce4ec, #f3e5f5);
+      --bg-depth: 20px;
+      perspective: 1000px;
+      transform-style: preserve-3d;
+      --text-color: #004d40;
+      --container-bg: white;
+      --item-bg: #e0f2f1;
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --transition-speed: 0.8s;
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(45deg, #1a237e, #311b92, #4a148c);
+      --text-color: #80cbc4;
+      --container-bg: #263238;
+      --item-bg: #37474f;
+      --shadow-color: rgba(0, 0, 0, 0.5);
+    }
+
+    body[data-mood="happy"] {
+      --bg-gradient: linear-gradient(45deg, #fff176, #ffb74d, #ff8a65);
+      animation: gradientShift 15s ease infinite;
+    }
+
+    body[data-mood="sad"] {
+      --bg-gradient: linear-gradient(45deg, #90caf9, #7986cb, #9575cd);
+      animation: calmingWaves 20s ease infinite;
+    }
+
+    body[data-mood="stressed"] {
+      --bg-gradient: linear-gradient(45deg, #81c784, #4db6ac, #4fc3f7);
+      animation: breatheFlow 15s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes calmingWaves {
+      0% { background-position: 0% 50%; }
+      25% { background-position: 50% 25%; }
+      50% { background-position: 100% 50%; }
+      75% { background-position: 50% 75%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    @keyframes breatheFlow {
+      0% { background-size: 100% 100%; }
+      50% { background-size: 120% 120%; }
+      100% { background-size: 100% 100%; }
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--bg-gradient);
+      background-size: 400% 400%;
+      animation: gradient 15s ease infinite;
+      margin: 0;
+      padding: 20px;
+      text-align: center;
+      color: var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    @keyframes gradient {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      background: var(--container-bg);
+      padding: 20px;
+      border-radius: 12px;
+      transform: translateZ(var(--bg-depth));
+      transition: transform 0.3s ease;
+      max-width: 700px;
+      margin: auto;
+      box-shadow: 0 0 25px var(--shadow-color);
+      transition: all 0.3s ease;
+    }
+
+    .theme-switch {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      padding: 10px 20px;
+      border-radius: 20px;
+      background: var(--container-bg);
+      color: var(--text-color);
+      cursor: pointer;
+      border: 2px solid var(--text-color);
+      transition: all 0.3s ease;
+    }
+
+    .theme-switch:hover {
+      transform: scale(1.05);
+    }
+    h1, h2 {
+      color: #00796b;
+    }
+    select, button, input {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+    #quote {
+      margin-top: 20px;
+      font-style: italic;
+    }
+    .log, .music, .contacts, .hospitals, .doctor {
+      margin-top: 30px;
+      text-align: left;
+    }
+    audio {
+      width: 100%;
+      margin-top: 10px;
+    }
+    ul {
+      list-style: none;
+      padding: 0;
+    }
+    li {
+      background: var(--item-bg);
+      margin-bottom: 5px;
+      padding: 8px;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+    }
+    .platform-logos img {
+      height: 40px;
+      margin: 0 10px;
+      vertical-align: middle;
+      filter: drop-shadow(0 0 5px var(--shadow-color));
+    }
+    select, button, input {
+      background: var(--container-bg);
+      color: var(--text-color);
+      border: 2px solid var(--text-color);
+      transition: all 0.3s ease;
+    }
+    select:hover, button:hover {
+      transform: scale(1.05);
+    }
+    #quote {
+      padding: 15px;
+      border-radius: 10px;
+      background: var(--item-bg);
+      margin: 20px 0;
+      transition: all 0.3s ease;
+    }
+
+    .song-list, .live-streams {
+      display: grid;
+      gap: 15px;
+      margin: 15px 0;
+    }
+
+    .song-item, .stream-item {
+      background: var(--item-bg);
+      padding: 15px;
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .song-item p, .stream-item p {
+      margin: 0 0 10px 0;
+      font-weight: bold;
+    }
+
+    .song-item audio, .stream-item audio {
+      width: 100%;
+      margin: 5px 0;
+    }
+
+    h3 {
+      margin-top: 20px;
+      color: var(--text-color);
+    }
+
+    .platform-link {
+      display: inline-block;
+      margin: 15px;
+      transition: transform 0.2s;
+    }
+
+    .platform-link:hover {
+      transform: scale(1.1);
+    }
+
+    .stream-embeds {
+      display: grid;
+      gap: 20px;
+      margin: 20px 0;
+    }
+
+    .embed-item {
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 6px var(--shadow-color);
+    }
+
+    .doctor-section {
+      margin-top: 40px;
+      padding: 20px;
+      background: var(--item-bg);
+      border-radius: 10px;
+    }
+
+    .emergency-contacts {
+      background: var(--container-bg);
+      padding: 15px;
+      border-radius: 8px;
+      margin: 15px 0;
+    }
+
+    .online-consultation form {
+      display: grid;
+      gap: 10px;
+      margin: 15px 0;
+    }
+
+    .online-consultation input,
+    .online-consultation textarea {
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid var(--text-color);
+      background: var(--container-bg);
+      color: var(--text-color);
+    }
+
+    .online-consultation textarea {
+      height: 100px;
+      resize: vertical;
+    }
+  .breathing-exercise {
+      text-align: center;
+      margin: 20px 0;
+      padding: 20px;
+      background: var(--item-bg);
+      border-radius: 10px;
+    }
+
+    .breathing-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: linear-gradient(45deg, #83a4d4, #b6fbff);
+      margin: 20px auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: transform 4s ease-in-out;
+    }
+
+    .breathing-circle.inhale {
+      transform: scale(1.2);
+    }
+
+    .breathing-circle.exhale {
+      transform: scale(1);
+    }
+
+    .instruction {
+      color: var(--text-color);
+      font-size: 1.2em;
+    }
+
+    #moodChart {
+      margin: 20px 0;
+      background: var(--container-bg);
+      border-radius: 10px;
+      padding: 10px;
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&libraries=places&callback=initMap"></script>
+</head>
+<body>
+  <button class="theme-switch" onclick="toggleTheme()">🌓 Toggle Theme</button>
+  <div class="container">
+    <h1>Mental Wellness Support</h1>
+    <label for="mood">How are you feeling today?</label><br>
+    <select id="mood">
+      <option>Happy</option>
+      <option>Sad</option>
+      <option>Stressed</option>
+      <option>Calm</option>
+      <option>Anxious</option>
+    </select><br>
+    <button onclick="logMood()">Log Mood</button>
+
+    <div id="quote">Loading motivational quote...</div>
+
+    <div class="log">
+      <h2>Your Mood History</h2>
+      <ul id="moodLog"></ul>
+      <canvas id="moodChart" width="400" height="200"></canvas>
+    </div>
+
+    
+
+    <div class="music">
+      <h2>Relaxing Music</h2>
+      <p>Take a deep breath and listen to relaxing music below:</p>
+      
+      <h3>Calming Songs</h3>
+      <div class="song-list">
+        <div class="song-item">
+          <p>Peaceful Piano</p>
+          <audio controls>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" type="audio/mp3">
+          </audio>
+        </div>
+        <div class="song-item">
+          <p>Nature Sounds</p>
+          <audio controls>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3" type="audio/mp3">
+          </audio>
+        </div>
+        <div class="song-item">
+          <p>Meditation Music</p>
+          <audio controls>
+            <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3" type="audio/mp3">
+          </audio>
+        </div>
+      </div>
+
+      <h3>Live Radio Streams</h3>
+      <div class="live-streams">
+        <div class="stream-item">
+          <p>Relaxing Piano Radio</p>
+          <audio controls>
+            <source src="http://streaming.radio.co/s5c5da6a36/listen" type="audio/mpeg">
+          </audio>
+        </div>
+        <div class="stream-item">
+          <p>Nature Sounds Radio</p>
+          <audio controls>
+            <source src="http://streams.calmradio.com/api/55/128/stream/1" type="audio/mpeg">
+          </audio>
+        </div>
+      </div>
+
+      <p>Or explore more songs on these platforms:</p>
+      <h3>Live Music Streams</h3>
+      <div class="stream-embeds">
+        <!-- Happy Playlist -->
+        <div class="embed-item" id="happyPlaylist">
+          <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX0s5kDXi1oC5" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        <!-- Calm & Relaxing Playlist -->
+        <div class="embed-item" id="calmPlaylist">
+          <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DWXe9gFZP0gtP" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        <!-- Motivational Playlist -->
+        <div class="embed-item" id="motivationalPlaylist">
+          <iframe style="border-radius:12px" src="https://open.spotify.com/embed/playlist/37i9dQZF1DX76Wlfdnj7AP" width="100%" height="352" frameBorder="0" allowfullscreen="" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>
+        </div>
+        <div class="embed-item">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/videoseries?list=PLMPEZwtm7PRH71z6UqjkiB5qLesBPxTZy" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <h3>Motivational Videos</h3>
+      <div class="stream-embeds">
+        <div class="embed-item">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/IdTMDpizis8" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <div class="embed-item">
+          <iframe width="100%" height="315" src="https://www.youtube.com/embed/ZXsQAXx_ao0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+      </div>
+
+      <div class="platform-logos">
+        <a href="https://open.spotify.com" target="_blank" class="platform-link">
+          <img src="https://storage.googleapis.com/pr-newsroom-wp/1/2018/11/Spotify_Logo_RGB_Green.png" alt="Spotify" style="height: 60px;">
+        </a>
+        <a href="https://music.youtube.com" target="_blank" class="platform-link">
+          <img src="https://music.youtube.com/img/on_platform_logo_dark.svg" alt="YouTube Music" style="height: 60px;">
+        </a>
+        <a href="https://www.amazon.com/music" target="_blank" class="platform-link">
+          <img src="https://www.amazon.com/music/marketing/assets/images/amazon_music_logo_white.png" alt="Amazon Music" style="height: 60px;">
+        </a>
+      </div>
+    </div>
+
+    <div class="doctor-section">
+      <h2>Mental Health Support</h2>
+      
+      <div class="emergency-contacts">
+        <h3>24/7 Emergency Helplines</h3>
+        <ul>
+          <li>🆘 National Crisis Hotline: 988</li>
+          <li>🌟 Crisis Text Line: Text HOME to 741741</li>
+        </ul>
+      </div>
+
+      <div class="find-doctor">
+        <h3>Find a Mental Health Professional</h3>
+        <div id="map" style="height: 300px; margin: 20px 0; border-radius: 10px;"></div>
+        <button onclick="findNearbyDoctors()">Find Nearby Mental Health Professionals</button>
+      </div>
+
+      <div class="online-consultation">
+        <h3>Consultation Request</h3>
+        <form id="consultationForm" action="mailto:thunganithinyadav567@gmail.com" method="POST" enctype="text/plain">
+          <input type="text" name="name" placeholder="Your Name" required>
+          <input type="email" name="email" placeholder="Your Email" required>
+          <textarea name="concerns" placeholder="Brief description of your concerns" required></textarea>
+          <select name="consultation_type" required>
+            <option value="">Select Consultation Type</option>
+            <option value="online">Online Consultation</option>
+            <option value="in_person">In-Person Doctor Visit</option>
+          </select>
+          <select name="urgency" required>
+            <option value="">Select Urgency Level</option>
+            <option value="normal">Normal - Can wait a few days</option>
+            <option value="urgent">Urgent - Need help within 24 hours</option>
+            <option value="emergency">Emergency - Need immediate assistance</option>
+          </select>
+          <button type="submit">Request Consultation</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="contacts" id="contactsSection" style="display:none;">
+      <h2>Contact Your Family</h2>
+      <ul>
+        <li>Mom: +91-9876543210</li>
+        <li>Dad: +91-9123456789</li>
+        <li>Sibling: +91-9988776655</li>
+      </ul>
+    </div>
+
+    <div class="hospitals">
+      <h2>Nearby Mental Health Clinics</h2>
+      <p><a href="https://www.google.com/maps/search/mental+health+hospital+near+me/" target="_blank">Click to find nearby clinics on Google Maps</a></p>
+    </div>
+
+    <div class="doctor">
+      <h2>Contact a Mental Health Doctor</h2>
+      <p>If you need professional support, please email:</p>
+      <p><a href="mailto:support@mentalhealthcare.org">support@mentalhealthcare.org</a></p>
+    </div>
+  </div>
+
+  <script>
+    // Theme handling with system preference detection
+    function detectSystemTheme() {
+      return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    }
+
+    function setTheme(theme) {
+      document.documentElement.setAttribute('data-theme', theme);
+      localStorage.setItem('theme', theme);
+    }
+
+    function toggleTheme() {
+      const currentTheme = document.documentElement.getAttribute('data-theme');
+      const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      setTheme(newTheme);
+    }
+
+    // Set initial theme based on system preference or saved preference
+    const savedTheme = localStorage.getItem('theme');
+    setTheme(savedTheme || detectSystemTheme());
+
+    // Listen for system theme changes
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+      if (!localStorage.getItem('theme')) {
+        setTheme(e.matches ? 'dark' : 'light');
+      }
+    });
+
+    const moodLog = JSON.parse(localStorage.getItem('moodLog')) || [];
+
+    function logMood() {
+      const mood = document.getElementById('mood').value;
+      const time = new Date().toLocaleString();
+      moodLog.push(`${time}: ${mood}`);
+      localStorage.setItem('moodLog', JSON.stringify(moodLog));
+      displayLog();
+
+      // Update body attribute for mood-based styling
+      document.body.setAttribute('data-mood', mood.toLowerCase());
+
+      // Smooth transition for mood changes
+      document.body.style.transition = 'all var(--transition-speed) ease';
+
+      if (mood === "Sad" || mood === "Stressed" || mood === "Anxious") {
+        document.getElementById('contactsSection').style.display = 'block';
+        document.getElementById('quote').style.animation = 'glow 2s ease-in-out infinite';
+        // Send email notification for concerning moods
+        const subject = "Wellness Check-In";
+        const body = `A user has reported feeling ${mood} at ${time}. Please reach out to provide support.`;
+        window.location.href = `mailto:thunganithinyadav567@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        
+        // Show motivational content
+        loadQuote();
+        document.getElementById('motivationalPlaylist').scrollIntoView({ behavior: 'smooth' });
+      } else if (mood === "Happy") {
+        document.getElementById('contactsSection').style.display = 'none';
+        document.getElementById('happyPlaylist').scrollIntoView({ behavior: 'smooth' });
+      } else {
+        document.getElementById('contactsSection').style.display = 'none';
+        document.getElementById('calmPlaylist').scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+
+    // Array of motivational quotes for different moods
+    const quotes = {
+      sad: [
+        "Every day holds a possibility of a miracle.",
+        "You are stronger than you think.",
+        "Your story isn't over yet.",
+        "Better days are coming.",
+        "You're not alone in this journey.",
+        "Small steps still move you forward."
+      ],
+      stressed: [
+        "You've overcome every difficult day so far.",
+        "Focus on what you can control.",
+        "This moment is temporary.",
+        "Your peace is priority.",
+        "Take it one moment at a time.",
+        "You're doing better than you think."
+      ],
+      anxious: [
+        "You are safe in this moment.",
+        "This feeling will pass.",
+        "You've got through this before.",
+        "Focus on now, not what if.",
+        "You are in control.",
+        "Small progress is still progress."
+      ],
+      calm: [
+        "Embrace this peaceful moment.",
+        "You're exactly where you need to be.",
+        "Keep this tranquil energy.",
+        "Peace begins with you.",
+        "Cherish this calmness."
+      ],
+      happy: [
+        "Your joy is contagious!",
+        "Keep embracing this happiness.",
+        "You deserve this joy.",
+        "Let your light shine bright.",
+        "Share your happiness with others.",
+        "This is your moment!"
+      ]
+    };
+
+    async function loadQuote() {
+      try {
+        const mood = document.getElementById('mood').value.toLowerCase();
+        const moodQuotes = quotes[mood] || quotes.happy;
+        const randomQuote = moodQuotes[Math.floor(Math.random() * moodQuotes.length)];
+        document.getElementById('quote').textContent = randomQuote;
+      } catch (error) {
+        document.getElementById('quote').textContent = "Every day is a fresh start!";
+      }
+    }
+
+    function displayLog() {
+      const list = document.getElementById('moodLog');
+      list.innerHTML = '';
+      moodLog.slice().reverse().forEach(entry => {
+        const li = document.createElement('li');
+        li.textContent = entry;
+        list.appendChild(li);
+      });
+    }
+
+    async function loadQuote() {
+      try {
+        const res = await fetch('https://zenquotes.io/api/random');
+        const data = await res.json();
+        document.getElementById('quote').textContent = `"${data[0].q}" – ${data[0].a}`;
+      } catch (error) {
+        document.getElementById('quote').textContent = "Stay strong. You're doing great!";
+      }
+    }
+
+    function startBreathing() {
+      const circle = document.getElementById('breathingCircle');
+      const instruction = circle.querySelector('.instruction');
+      
+      function breathingCycle() {
+        // Inhale
+        instruction.textContent = 'Inhale';
+        circle.classList.add('inhale');
+        
+        setTimeout(() => {
+          // Hold
+          instruction.textContent = 'Hold';
+          
+          setTimeout(() => {
+            // Exhale
+            instruction.textContent = 'Exhale';
+            circle.classList.remove('inhale');
+            
+            setTimeout(() => {
+              instruction.textContent = 'Breathe with me';
+            }, 4000);
+          }, 2000);
+        }, 4000);
+      }
+      
+      breathingCycle();
+      setInterval(breathingCycle, 12000);
+    }
+
+    function updateMoodChart() {
+      const ctx = document.getElementById('moodChart').getContext('2d');
+      const moodCounts = {
+        'Happy': 0, 'Sad': 0, 'Stressed': 0, 'Calm': 0, 'Anxious': 0
+      };
+      
+      moodLog.forEach(entry => {
+        const mood = entry.split(': ')[1];
+        moodCounts[mood]++;
+      });
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(moodCounts),
+          datasets: [{
+            label: 'Mood Frequency',
+            data: Object.values(moodCounts),
+            backgroundColor: [
+              '#4CAF50', '#f44336', '#ff9800', '#2196F3', '#9C27B0'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                stepSize: 1
+              }
+            }
+          }
+        }
+      });
+    }
+
+    displayLog();
+    loadQuote();
+    updateMoodChart();
+  </script>
+</body>
+</html>
